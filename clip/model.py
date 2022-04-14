@@ -351,6 +351,25 @@ class CLIP(nn.Module):
 
         return x
 
+    def encode_text_sents(self, text):
+        print("text", text.shape)
+        import pdb
+        pdb.set_trace()
+
+        x = self.token_embedding(text)  # [batch_size, n_ctx, d_model]
+
+        x = x + self.positional_embedding
+        x = x.permute(1, 0, 2)  # NLD -> LND
+        x = self.transformer(x, attn_mask=self.attn_mask)
+        x = x.permute(1, 0, 2)  # LND -> NLD
+        x = self.ln_final(x)
+
+        # x.shape = [batch_size, n_ctx, transformer.width]
+        # take features from the eot embedding (eot_token is the highest number in each sequence)
+        x = x @ self.text_projection
+
+        return x
+
     def forward(self, image, text):
         image_features = self.encode_image(image)
         text_features = self.encode_text(text)
