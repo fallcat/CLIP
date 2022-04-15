@@ -352,10 +352,6 @@ class CLIP(nn.Module):
         return x
 
     def encode_text_sents(self, text):
-        print("text", text.shape)
-        import pdb
-        pdb.set_trace()
-
         x = self.token_embedding(text).type(self.dtype)  # [batch_size, n_ctx, d_model]
 
         x = x + self.positional_embedding.type(self.dtype)
